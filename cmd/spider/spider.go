@@ -32,5 +32,5 @@ func main() {
 	logger.Info("正启动于...")
 	logger.Info("配置加载完成！")
 
-	engine.New().Start()
+	engine.New(engine.Spider).Start()
 }

@@ -47,9 +47,9 @@ func SetResponseWriterHeader(res http.ResponseWriter, key, value string) {
 	res.Header().Set(key, value)
 }
 
-// AddURLQuery 向 URL 中添加 query 参数
+// AddURLQuery 向 url 中添加 query 参数
 //
-// 添加 URL 参数
+// 添加 url 参数
 func AddURLQuery(url, key, value string) string {
 	var sb strings.Builder
 	sb.WriteString(url)

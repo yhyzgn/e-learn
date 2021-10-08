@@ -63,3 +63,12 @@ func Exists(table, where string, args ...interface{}) bool {
 	}
 	return count > 0
 }
+
+// Select ...
+func Select(table, where string, value interface{}, args ...interface{}) error {
+	tx := DB.Table(table)
+	if where != "" {
+		tx = tx.Where(where, args...)
+	}
+	return tx.Find(value).Error
+}

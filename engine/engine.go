@@ -7,26 +7,37 @@
 package engine
 
 import (
+	"e-learn/downloader"
 	"e-learn/engine/res"
 	"e-learn/logger"
 	"e-learn/orm"
 	"e-learn/orm/entity"
 	"fmt"
 	"math/rand"
+	"path"
 	"time"
 
 	"github.com/yhyzgn/goat/client"
 )
 
+type Operation int
+
+const (
+	Spider     Operation = iota // 爬
+	Downloader                  // 下载
+)
+
 // Engine ...
 type Engine struct {
-	retries map[string]int
+	retries   map[string]int
+	operation Operation
 }
 
 // New ...
-func New() *Engine {
+func New(operation Operation) *Engine {
 	return &Engine{
-		retries: make(map[string]int),
+		retries:   make(map[string]int),
+		operation: operation,
 	}
 }
 
@@ -34,7 +45,16 @@ func New() *Engine {
 func (e *Engine) Start() {
 	e.loadingPlugins()
 
-	e.fetch()
+	switch e.operation {
+	case Spider:
+		e.fetch()
+		break
+	case Downloader:
+		e.download()
+		break
+	default:
+		break
+	}
 }
 
 func (e *Engine) loadingPlugins() {
@@ -54,7 +74,62 @@ func (e *Engine) loadingPlugins() {
 
 func (e *Engine) fetch() {
 	//e.fetchAndLog(chinese, "语文")
-	e.fetchAndLog(math, "数学")
+	//e.fetchAndLog(math, "数学")
+	//e.fetchAndLog(english, "英语")
+	e.fetchAndLog(physics, "物理学")
+}
+
+func (e *Engine) download() {
+	dl := downloader.New("E:/E-Learn")
+
+	logger.InfoF("正在读取所有的科目信息...")
+
+	var subjects []entity.Subject
+	if err := orm.Select("subject", "id=101", &subjects); err != nil {
+		logger.Error(err)
+		return
+	}
+
+	for _, subject := range subjects {
+		logger.InfoF("正在读取科目【{}】的单元信息...", subject.Name)
+		var units []entity.Unit
+		if err := orm.Select("unit", "subject=?", &units, subject.Id); err != nil {
+			logger.Error(err)
+			return
+		}
+
+		for _, unit := range units {
+			logger.InfoF("正在读取科目【{}】的单元【{}】的课程信息...", subject.Name, unit.Name)
+			var courses []entity.Course
+			if err := orm.Select("course", "subject_id=? and unit=?", &courses, subject.Id, unit.Id); err != nil {
+				logger.Error(err)
+				return
+			}
+
+			for _, course := range courses {
+				logger.InfoF("正在读取科目【{}】的单元【{}】的课程【{}】的章节信息...", subject.Name, unit.Name, course.CourseName)
+				var wares []entity.Courseware
+				if err := orm.Select("courseware", "course_id=?", &wares, course.CourseId); err != nil {
+					logger.Error(err)
+					return
+				}
+
+				for _, ware := range wares {
+					filepath := path.Join(subject.Name, unit.Name, course.CourseName, ware.LectureName)
+					// 添加到下载列表
+					dl.Append(filepath, ware.Name+".mp4", ware.Video)
+				}
+				logger.InfoF("科目【{}】的单元【{}】的课程【{}】的章节信息获取完成", subject.Name, unit.Name, course.CourseName)
+			}
+			logger.InfoF("科目【{}】的单元【{}】的课程信息获取完成", subject.Name, unit.Name)
+		}
+		logger.InfoF("科目【{}】的单元信息获取完成", subject.Name)
+	}
+
+	// 下载
+	if err := dl.Start(); err != nil {
+		panic(err)
+	}
 }
 
 func (e *Engine) fetchAndLog(sb subject, name string) {
