@@ -13,12 +13,14 @@ import (
 	"github.com/yhyzgn/goat/file"
 	"github.com/yhyzgn/golus"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"path"
 	"runtime"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type Resource struct {
@@ -101,11 +103,13 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 		if nil != progress {
 			// 获取到文件大小
 			fileSize, _ := strconv.ParseInt(resp.Header.Get("Content-Length"), 10, 64)
+			labelRune := []rune(finalFilename)
+			label := string(labelRune[int(math.Max(float64(len(labelRune)-32), 0)):])
 			bar := progress.Add(
 				fileSize,
 				mpb.NewBarFiller(mpb.BarStyle().Lbound("[").Filler("=").Tip(">").Padding("_").Rbound("]")),
 				mpb.PrependDecorators(
-					decor.Name(finalFilename, decor.WC{W: len(finalFilename) + 1, C: decor.DidentRight}),
+					decor.Name(label, decor.WC{W: len(label) + 1, C: decor.DidentRight}),
 					decor.CountersKibiByte("% .2f / % .2f", decor.WC{W: 32}),
 					decor.OnComplete(decor.EwmaETA(decor.ET_STYLE_MMSS, 0, decor.WCSyncWidth), ""),
 				),
@@ -152,6 +156,7 @@ func (d *Downloader) Start() error {
 	progress := mpb.New(
 		mpb.WithWaitGroup(d.wg),
 		mpb.WithWidth(60),
+		mpb.WithRefreshRate(300*time.Millisecond),
 	)
 
 	for _, resource := range d.Resources {
