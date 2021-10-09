@@ -66,13 +66,12 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 			return err
 		}
 	}
-
 	finalFilename := path.Join(dir, resource.filename)
-
-	logger.InfoF("开始下载文件【{}】...", finalFilename)
 
 	// 文件不存在时才下载
 	if !file.Exists(finalFilename) {
+		logger.InfoF("开始下载文件【{}】...", finalFilename)
+
 		// 创建临时文件
 		tempFilename := finalFilename + ".tmp"
 		target, err := os.Create(tempFilename)
@@ -136,14 +135,14 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 		}
 		_ = target.Close()
 
+		logger.InfoF("文件【{}】下载完成", finalFilename)
+
 		// 修改临时文件为最终文件
 		err = os.Rename(tempFilename, finalFilename)
 		if nil != err {
 			return err
 		}
 	}
-
-	logger.InfoF("文件【{}】下载完成", finalFilename)
 
 	<-d.pool
 

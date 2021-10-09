@@ -83,7 +83,7 @@ func (e *Engine) fetch() {
 func (e *Engine) download() {
 	dl := downloader.New("E:/E-Learn")
 
-	logger.InfoF("正在读取所有的科目信息...")
+	logger.DebugF("正在读取所有的科目信息...")
 
 	var subjects []entity.Subject
 	if err := orm.Select("subject", "id=101", &subjects); err != nil {
@@ -92,7 +92,7 @@ func (e *Engine) download() {
 	}
 
 	for _, subject := range subjects {
-		logger.InfoF("正在读取科目【{}】的单元信息...", subject.Name)
+		logger.DebugF("正在读取科目【{}】的单元信息...", subject.Name)
 		var units []entity.Unit
 		if err := orm.Select("unit", "subject=?", &units, subject.Id); err != nil {
 			logger.Error(err)
@@ -100,7 +100,7 @@ func (e *Engine) download() {
 		}
 
 		for _, unit := range units {
-			logger.InfoF("正在读取科目【{}】的单元【{}】的课程信息...", subject.Name, unit.Name)
+			logger.DebugF("正在读取科目【{}】的单元【{}】的课程信息...", subject.Name, unit.Name)
 			var courses []entity.Course
 			if err := orm.Select("course", "subject_id=? and unit=?", &courses, subject.Id, unit.Id); err != nil {
 				logger.Error(err)
@@ -108,7 +108,7 @@ func (e *Engine) download() {
 			}
 
 			for _, course := range courses {
-				logger.InfoF("正在读取科目【{}】的单元【{}】的课程【{}】的章节信息...", subject.Name, unit.Name, course.CourseName)
+				logger.DebugF("正在读取科目【{}】的单元【{}】的课程【{}】的章节信息...", subject.Name, unit.Name, course.CourseName)
 				var wares []entity.Courseware
 				if err := orm.Select("courseware", "course_id=?", &wares, course.CourseId); err != nil {
 					logger.Error(err)
@@ -120,11 +120,11 @@ func (e *Engine) download() {
 					// 添加到下载列表
 					dl.Append(filepath, ware.Name+".mp4", ware.Video)
 				}
-				logger.InfoF("科目【{}】的单元【{}】的课程【{}】的章节信息获取完成", subject.Name, unit.Name, course.CourseName)
+				logger.DebugF("科目【{}】的单元【{}】的课程【{}】的章节信息获取完成", subject.Name, unit.Name, course.CourseName)
 			}
-			logger.InfoF("科目【{}】的单元【{}】的课程信息获取完成", subject.Name, unit.Name)
+			logger.DebugF("科目【{}】的单元【{}】的课程信息获取完成", subject.Name, unit.Name)
 		}
-		logger.InfoF("科目【{}】的单元信息获取完成", subject.Name)
+		logger.DebugF("科目【{}】的单元信息获取完成", subject.Name)
 	}
 
 	// 下载
