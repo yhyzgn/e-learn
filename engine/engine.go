@@ -81,12 +81,16 @@ func (e *Engine) fetch() {
 }
 
 func (e *Engine) download() {
+	e.downloadBy(chinese, "语文")
+}
+
+func (e *Engine) downloadBy(sub subject, name string) {
 	dl := downloader.New("E:/E-Learn")
 
-	logger.DebugF("正在读取所有的科目信息...")
+	logger.DebugF("正在读取科目【{}】的课程信息...", name)
 
 	var subjects []entity.Subject
-	if err := orm.Select("subject", "id=101", &subjects); err != nil {
+	if err := orm.Select("subject", "id=?", &subjects, sub); err != nil {
 		logger.Error(err)
 		return
 	}
