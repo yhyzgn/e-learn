@@ -110,7 +110,7 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 				mpb.BarFillerClearOnComplete(),
 				mpb.PrependDecorators(
 					decor.Name(label, decor.WC{W: len(label) + 1, C: decor.DidentRight}),
-					decor.CountersKibiByte("% .2f / % .2f", decor.WC{W: 32}),
+					decor.CountersKibiByte("% .2f / % .2f ", decor.WC{W: 32}),
 					decor.OnComplete(decor.EwmaETA(decor.ET_STYLE_MMSS, 0, decor.WCSyncWidth), ""),
 				),
 				mpb.AppendDecorators(
