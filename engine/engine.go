@@ -76,7 +76,8 @@ func (e *Engine) fetch() {
 	//e.fetchAndLog(chinese, "语文")
 	//e.fetchAndLog(math, "数学")
 	//e.fetchAndLog(english, "英语")
-	e.fetchAndLog(physics, "物理学")
+	//e.fetchAndLog(physics, "物理学")
+	e.fetchAndLog(chemistry, "化学")
 }
 
 func (e *Engine) download() {

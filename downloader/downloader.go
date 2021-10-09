@@ -128,14 +128,13 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 		}(proxyReader)
 
 		// 将下载的文件流拷贝到临时文件
-		_, err = io.Copy(target, proxyReader)
+		//_, err = io.Copy(target, proxyReader)
+		_, err = io.CopyBuffer(target, proxyReader, make([]byte, 32*1024*1024))
 		if nil != err {
 			_ = target.Close()
 			return err
 		}
 		_ = target.Close()
-
-		logger.InfoF("文件【{}】下载完成", finalFilename)
 
 		// 修改临时文件为最终文件
 		err = os.Rename(tempFilename, finalFilename)
@@ -143,6 +142,8 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 			return err
 		}
 	}
+
+	logger.InfoF("文件【{}】下载完成", finalFilename)
 
 	<-d.pool
 
