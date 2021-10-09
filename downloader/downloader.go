@@ -107,6 +107,7 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 			bar := progress.Add(
 				fileSize,
 				mpb.NewBarFiller(mpb.BarStyle().Lbound("[").Filler("=").Tip(">").Padding("_").Rbound("]")),
+				mpb.BarFillerClearOnComplete(),
 				mpb.PrependDecorators(
 					decor.Name(label, decor.WC{W: len(label) + 1, C: decor.DidentRight}),
 					decor.CountersKibiByte("% .2f / % .2f", decor.WC{W: 32}),
