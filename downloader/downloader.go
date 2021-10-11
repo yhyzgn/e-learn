@@ -59,6 +59,10 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 
 	d.pool <- &resource
 
+	defer func() {
+		<-d.pool
+	}()
+
 	dir := path.Join(d.TargetDir, resource.path)
 	if !file.Exists(dir) {
 		err := os.MkdirAll(dir, os.ModeDir)
@@ -144,8 +148,6 @@ func (d *Downloader) download(resource Resource, progress *mpb.Progress) error {
 			return err
 		}
 	}
-
-	<-d.pool
 
 	return nil
 }
