@@ -77,7 +77,10 @@ func (e *Engine) fetch() {
 	//e.fetchAndLog(math, "数学")
 	//e.fetchAndLog(english, "英语")
 	//e.fetchAndLog(physics, "物理学")
-	e.fetchAndLog(chemistry, "化学")
+	//e.fetchAndLog(chemistry, "化学")
+	//e.fetchAndLog(biology, "生物学")
+	//e.fetchAndLog(history, "历史学")
+	e.fetchAndLog(geography, "地理学")
 }
 
 func (e *Engine) download() {
@@ -385,7 +388,6 @@ func (e *Engine) saveCourseware(lecture *res.Lecture, ware *res.Courseware) {
 		CourseId:     ware.CourseId,
 		LectureId:    ware.LectureId,
 		LectureName:  lecture.LectureName,
-		PlayStatus:   ware.PlayStatus,
 		CoursewareId: ware.CoursewareId,
 		Name:         ware.Name,
 		Video:        ware.Video,
